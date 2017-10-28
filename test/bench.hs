@@ -14,6 +14,7 @@ import qualified Data.Text.Lazy as TL
 import           P
 
 import           Hydrant
+import qualified Hydrant.Monadic as M
 
 import qualified Lucid as Lucid
 import qualified Lucid.Base as Lucid
@@ -53,6 +54,29 @@ nested n =
 escape :: Text -> Int -> Text
 escape t n =
   escapeEntities (T.replicate n t)
+
+-- -----------------------------------------------------------------------------
+-- Hydrant.Monadic
+
+mthing :: M.Html ()
+mthing = do
+  M.liftHtml (doctype "HTML")
+  M.parentNode (Tag "div") [Attribute (AttributeKey "blink") (AttributeValue "160bpm")] $
+    M.textNode "marquee marquee marquee netscape navigator"
+  M.voidNode (Tag "img") [Attribute (AttributeKey "src") (AttributeValue "google.com")]
+  M.parentNode (Tag "p") [] $
+    M.textNode "html is for you and me"
+
+mlinear :: Int -> M.Html ()
+mlinear n =
+  replicateM_ n mthing
+
+mnested :: Int -> M.Html ()
+mnested 0 =
+  mthing
+mnested n = do
+  M.parentNode (Tag "div") [Attribute (AttributeKey "blink") (AttributeValue "210bpm")] $
+    mthing *> mnested (n-1)
 
 -- -----------------------------------------------------------------------------
 -- Blaze
@@ -126,6 +150,7 @@ main = do
       go f = nf toText . f
       bgo f = nf bToText . f
       lgo f = nf lToText . f
+      mgo f = nf toText . M.runHtml . f
   glass <- T.readFile "test/glass.txt"
   defaultMainWith cfg [
       bgroup "linear" [
@@ -133,6 +158,10 @@ main = do
         , bench "hydrant-linear-200" (go linear 200)
         , bench "hydrant-linear-500" (go linear 500)
         , bench "hydrant-linear-1000" (go linear 1000)
+        , bench "hydrant-monadic-linear-100" (mgo mlinear 100)
+        , bench "hydrant-monadic-linear-200" (mgo mlinear 200)
+        , bench "hydrant-monadic-linear-500" (mgo mlinear 500)
+        , bench "hydrant-monadic-linear-1000" (mgo mlinear 1000)
         , bench "lucid-linear-100" (lgo llinear 100)
         , bench "lucid-linear-200" (lgo llinear 200)
         , bench "lucid-linear-500" (lgo llinear 500)
@@ -147,6 +176,10 @@ main = do
         , bench "hydrant-nested-200" (go nested 200)
         , bench "hydrant-nested-500" (go nested 500)
         , bench "hydrant-nested-1000" (go nested 1000)
+        , bench "hydrant-monadic-nested-100" (mgo mnested 100)
+        , bench "hydrant-monadic-nested-200" (mgo mnested 200)
+        , bench "hydrant-monadic-nested-500" (mgo mnested 500)
+        , bench "hydrant-monadic-nested-1000" (mgo mnested 1000)
         , bench "lucid-nested-100"  (lgo lnested 100)
         , bench "lucid-nested-200"  (lgo lnested 200)
         , bench "lucid-nested-500"  (lgo lnested 500)
