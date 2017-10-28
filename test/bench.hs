@@ -30,7 +30,7 @@ import qualified Text.Blaze.Html.Renderer.Text as Blaze
 
 thing :: Html
 thing =
-  fold [
+  mconcat [
       doctype "HTML"
     , parentNode (Tag "div") [Attribute (AttributeKey "blink") (AttributeValue "160bpm")]
         (textNode "marquee marquee marquee netscape navigator")
@@ -41,7 +41,7 @@ thing =
 
 linear :: Int -> Html
 linear n =
-  fold (L.replicate n thing)
+  mconcat (L.replicate n thing)
 
 nested :: Int -> Html
 nested 0 =
@@ -59,7 +59,7 @@ escape t n =
 
 bthing :: Blaze.Html
 bthing =
-  fold [
+  mconcat [
       Blaze.docType
     , Blaze.div
         (Blaze.text "marquee marquee marquee netscape navigator")
@@ -71,7 +71,7 @@ bthing =
 
 blinear :: Int -> Blaze.Html
 blinear n =
-  fold (L.replicate n bthing)
+  mconcat (L.replicate n bthing)
 
 bnested :: Int -> Blaze.Html
 bnested 0 =
@@ -89,7 +89,7 @@ bToText =
 
 lthing :: Lucid.Html ()
 lthing =
-  fold [
+  mconcat [
       Lucid.doctype_
     , Lucid.div_
         [Lucid.Attribute "blink" "160bpm"]
@@ -100,7 +100,7 @@ lthing =
 
 llinear :: Int -> Lucid.Html ()
 llinear n =
-  fold (L.replicate n lthing)
+  mconcat (L.replicate n lthing)
 
 lnested :: Int -> Lucid.Html ()
 lnested 0 =
