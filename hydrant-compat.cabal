@@ -1,0 +1,36 @@
+name:                hydrant-compat
+version:             0.1
+license:             BSD3
+author:              (c) 2017 Ambiata
+                     (c) 2018 Tim Humphries
+category:            Web
+build-type:          Simple
+cabal-version:       >=1.10
+
+synopsis:
+  Simple HTML combinators (compat)
+description:
+  Simple HTML combinators.
+  .
+  This is the original Ambiata version of Hydrant, cleaned up for public
+  use and to prevent bitrot in dependent projects.
+
+library
+  build-depends:
+                     base             >= 3      && < 5
+                   , bytestring       >= 0.10.4 && < 0.11
+                   , text             == 1.2.*
+
+  default-language:
+                     Haskell2010
+
+  ghc-options:
+                     -Wall
+
+  hs-source-dirs:
+                     src
+
+  exposed-modules:
+                     Hydrant
+                     Hydrant.Data
+                     Hydrant.Raw
